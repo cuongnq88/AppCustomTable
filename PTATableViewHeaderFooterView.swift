@@ -402,6 +402,7 @@ extension PTATableViewHeaderFooterView: UIGestureRecognizerDelegate {
 	}
 	
 	public func pan(gestureState gestureState: UIGestureRecognizerState, translation: CGPoint, velocity: CGPoint) {
+        print("pan test")
 		let actualTranslation = actualizeTranslation(translation)
 		let percentage = PTATableViewItemHelper.percentageWith(offset: Double(actualTranslation.x), relativeToWidth: Double(CGRectGetWidth(bounds)))
 		direction = PTATableViewItemHelper.directionWith(percentage: percentage)

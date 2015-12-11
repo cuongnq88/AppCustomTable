@@ -99,7 +99,7 @@ public class PTATableViewItemStateAttributes {
 	
 	/** The slide behavior that `view` should use when the item is panned. Defaults to `.StickThenDragWithPan`. */
 	public var viewBehavior: PTATableViewItemSlidingViewBehavior
-	
+    
 	public convenience init() {
 		self.init(mode: .None, color: nil, view: nil)
 	}
@@ -112,7 +112,7 @@ public class PTATableViewItemStateAttributes {
 		self.view = view
 		viewBehavior = .StickThenDragWithPan
 	}
-	
+    
 }
 
 

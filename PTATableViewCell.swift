@@ -218,6 +218,7 @@ private extension PTATableViewCell {
 private extension PTATableViewCell {
 	
 	private func animateWith(offset offset: Double) {
+        print("animateWith")
 		let percentage = PTATableViewItemHelper.percentageWith(offset: offset, relativeToWidth: Double(CGRectGetWidth(bounds)))
 		
 		if let view = viewWith(percentage: percentage) {
@@ -251,12 +252,14 @@ private extension PTATableViewCell {
 				} else if percentage >= leftToRightAttr.triggerPercentage {
 					position.x = PTATableViewItemHelper.offsetWith(percentage: percentage - halfLeftToRightTriggerPercentage, relativeToWidth: width)
 				}
+                print("LeftToRight x = \(position.x)")
 			} else if direction == .RightToLeft {
 				if (percentage <= 0.0) && (percentage >= -rightToLeftAttr.triggerPercentage) {
 					position.x = width - PTATableViewItemHelper.offsetWith(percentage: halfRightToLeftTriggerPercentage, relativeToWidth: width)
 				} else if percentage <= -rightToLeftAttr.triggerPercentage {
 					position.x = width + PTATableViewItemHelper.offsetWith(percentage: percentage + halfRightToLeftTriggerPercentage, relativeToWidth: width)
 				}
+                print("RightToLeft x = \(position.x)")
 			}
 			
 		case .DragWithPanThenStick:
@@ -292,14 +295,35 @@ private extension PTATableViewCell {
 		
 		if let activeView = view {
 			var activeViewFrame = activeView.bounds
-			activeViewFrame.origin.x = position.x - (activeViewFrame.size.width / 2.0)
-			activeViewFrame.origin.y = position.y - (activeViewFrame.size.height / 2.0)
+            if direction == .LeftToRight {
+                let positionX = position.x - activeViewFrame.size.width
+                if(positionX >= 0){
+                    activeViewFrame.origin.x = 0
+                    contentView.frame = CGRectOffset(contentView.bounds, activeViewFrame.size.width, 0.0)
+                }else{
+                    activeViewFrame.origin.x = positionX
+                }
+            } else if direction == .RightToLeft {
+                let positionX = self.contentView.bounds.width - activeViewFrame.size.width
+                print("positionX = \(positionX)")
+                if(position.x >= positionX) {
+                    activeViewFrame.origin.x = position.x
+                }else{
+                    activeViewFrame.origin.x = positionX
+                    contentView.frame = CGRectOffset(contentView.bounds, -activeViewFrame.size.width, 0.0)
+                    print("contentView.frame = \(contentView.frame)")
+                }
+                
+            }
 			
+			activeViewFrame.origin.y = position.y - (activeViewFrame.size.height / 2.0)
+			print("activeViewFrame = \(activeViewFrame)")
 			slidingView.frame = activeViewFrame
 		}
 	}
 	
 	private func moveWith(percentage percentage: Double, duration: NSTimeInterval, direction: PTATableViewItemState) {
+        print("moveWith")
 		var origin: CGFloat = 0.0
 		
 		if direction == .RightToLeft {
@@ -331,22 +355,18 @@ private extension PTATableViewCell {
 		UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: offset / 100.0, options: ([.CurveEaseOut, .AllowUserInteraction]), animations: { [unowned self] in
                 print("bounds  \(self.contentView.bounds)")
                 print("view bounds  \(self.leftToRightAttr.view?.bounds)")
-//                let point = CGPoint(x: 24,y: 0)
-//                self.contentView.frame.contains(point)
-                self.contentView.frame = CGRectMake(24, 0, self.contentView.bounds.width, self.contentView.bounds.height)
-                print("bounds  \(self.contentView.frame)")
-//				self.contentView.frame = self.contentView.bounds
-//				self.colorIndicatorView.backgroundColor = self.defaultColor
-//				self.slidingView.alpha = 0.0
-//				if ((self.stateWith(percentage: percentage) == .None) ||
-//					((self.direction == .LeftToRight) && (self.leftToRightAttr.viewBehavior == .StickThenDragWithPan)) ||
-//					((self.direction == .RightToLeft) && (self.rightToLeftAttr.viewBehavior == .StickThenDragWithPan))) {
-//						self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: self.viewBehaviorWith(percentage: percentage))
-//				} else {
-//					self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: .None)
-//				}
+				self.contentView.frame = self.contentView.bounds
+				self.colorIndicatorView.backgroundColor = self.defaultColor
+				self.slidingView.alpha = 0.0
+				if ((self.stateWith(percentage: percentage) == .None) ||
+					((self.direction == .LeftToRight) && (self.leftToRightAttr.viewBehavior == .StickThenDragWithPan)) ||
+					((self.direction == .RightToLeft) && (self.rightToLeftAttr.viewBehavior == .StickThenDragWithPan))) {
+						self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: self.viewBehaviorWith(percentage: percentage))
+				} else {
+					self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: .None)
+				}
 			}, completion: { [unowned self] (completed: Bool) -> Void in
-//				self.removeSwipingView()
+				self.removeSwipingView()
 			})
 	}
 	
@@ -371,6 +391,7 @@ private extension PTATableViewCell {
 extension PTATableViewCell {
 	
 	public override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        print("gestureRecognizerShouldBegin")
 		if let panGestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
 			let point = panGestureRecognizer.velocityInView(self)
 			if abs(point.x) > abs(point.y) {
@@ -393,6 +414,7 @@ extension PTATableViewCell {
 	}
 	
 	internal func _pan(gesture: UIPanGestureRecognizer) {
+        print("_pan 1")
 		if let shouldSwipe = delegate?.tableViewCellShouldSwipe?(self) {
 			if !shouldSwipe { return }
 		}
@@ -400,18 +422,21 @@ extension PTATableViewCell {
 	}
 	
 	public func pan(gestureState gestureState: UIGestureRecognizerState, translation: CGPoint) {
+        print("_pan 2")
 		pan(gestureState: gestureState, translation: translation, velocity: CGPointZero)
 	}
 	
 	public func pan(gestureState gestureState: UIGestureRecognizerState, translation: CGPoint, velocity: CGPoint) {
+        print("_pan 3")
 		let actualTranslation = actualizeTranslation(translation)
 		let percentage = PTATableViewItemHelper.percentageWith(offset: Double(actualTranslation.x), relativeToWidth: Double(CGRectGetWidth(bounds)))
 		direction = PTATableViewItemHelper.directionWith(percentage: percentage)
 		
 		if (gestureState == .Began) || (gestureState == .Changed) {
             print("Began")
+            
 			setupSwipingView()
-			
+			print("actualTranslation.x = \(actualTranslation.x)")
 			contentView.frame = CGRectOffset(contentView.bounds, actualTranslation.x, 0.0)
 			colorIndicatorView.backgroundColor = colorWith(percentage: percentage)
 			slidingView.alpha = alphaWith(percentage: percentage)
@@ -436,7 +461,7 @@ extension PTATableViewCell {
 			if (cellMode == .Exit) && (direction != .None) {
 				moveWith(percentage: percentage, duration: animationDurationWith(velocity: velocity), direction: cellState)
 			} else {
-				swipeToOriginWith(percentage: percentage)
+//				swipeToOriginWith(percentage: percentage)
 			}
 			
 			delegate?.tableViewCellDidEndSwiping?(self)
@@ -444,6 +469,7 @@ extension PTATableViewCell {
 	}
 	
 	public func actualizeTranslation(translation: CGPoint) -> CGPoint {
+        print("actualizeTranslation")
 		let width = CGRectGetWidth(bounds)
 		var panOffset = translation.x
 		if ((panOffset > 0.0) && leftToRightAttr.rubberbandBounce ||

@@ -59,20 +59,19 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         
         let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
         
-        cell.setPanGesture(.LeftToRight, mode: .Switch, color: view.tintColor, view: viewWithImage(named: "check"))
-        cell.setPanGesture(.RightToLeft, mode: .Exit, color: redColor, view: viewWithImage(named: "cross"))
+        let leftButtons = makeButton(["1","2"])
+        let rightButtons = makeButton(["A","B","C"])
         
-        cell.rightToLeftAttr.triggerPercentage = 0.1
-        cell.rightToLeftAttr.rubberbandBounce = true
-//        cell.rightToLeftAttr.viewBehavior = .DragWithPanThenStick
+        cell.setPanGesture(.LeftToRight, mode: .Switch, color: view.tintColor, view: leftButtons.view)
+        cell.setPanGesture(.RightToLeft, mode: .Switch, color: redColor, view: rightButtons.view)
+        
+        cell.rightToLeftAttr.triggerPercentage = 0
+        cell.rightToLeftAttr.rubberbandBounce = false
         cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
-//        cell.rightToLeftAttr.viewBehavior = .DragWithPan
         
-        cell.leftToRightAttr.triggerPercentage = 0.1
-        cell.leftToRightAttr.rubberbandBounce = true
-//        cell.leftToRightAttr.viewBehavior = .DragWithPanThenStick
+        cell.leftToRightAttr.triggerPercentage = 0
+        cell.leftToRightAttr.rubberbandBounce = false
         cell.leftToRightAttr.viewBehavior = .StickThenDragWithPan
-//        cell.leftToRightAttr.viewBehavior = .DragWithPan
         
         return cell
     }
@@ -119,6 +118,28 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         }
     }
 
+    // Mark: - Method
+    
+    func makeButton(buttons:[String]) -> (view:UIView, width:Int) {
+        let viewWidth = buttons.count * 51
+        let listColor = [UIColor.greenColor(), UIColor.redColor(), UIColor.darkGrayColor()]
+        let placeHolder = UIView(frame: CGRect(x:0,y: 0,width: viewWidth,height: 40))
+        
+        for (i,text) in buttons.enumerate() {
+            let button = UIButton(type: .Custom)
+            button.setTitle(text, forState: .Normal)
+            button.frame = CGRect(x: 51*i, y: 0, width: 50, height: 40)
+            button.backgroundColor = listColor[i % listColor.count]
+            button.addTarget(self, action: "buttonAction:", forControlEvents: .TouchUpInside)
+            placeHolder.addSubview(button)
+        }
+        return (view: placeHolder, width: viewWidth)
+    }
+    
+    func buttonAction(sender:UIButton) {
+        print("buttonAction");
+    }
+    
 }
 
 
