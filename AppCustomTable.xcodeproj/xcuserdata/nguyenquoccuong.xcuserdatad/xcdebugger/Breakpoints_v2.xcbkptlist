@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PTATableViewCell.swift"
-            timestampString = "471550163.703907"
+            timestampString = "471606936.828197"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "350"
-            endingLineNumber = "350"
+            startingLineNumber = "353"
+            endingLineNumber = "353"
             landmarkName = "swipeToOriginWith(percentage:)"
             landmarkType = "5">
          </BreakpointContent>

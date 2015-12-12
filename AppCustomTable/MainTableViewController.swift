@@ -57,13 +57,11 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         cell.delegate = self
         cell.textLabel?.text = objects[indexPath.row]
         
-        let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
-        
         let leftButtons = makeButton(["1","2"])
         let rightButtons = makeButton(["A","B","C"])
         
-        cell.setPanGesture(.LeftToRight, mode: .Switch, color: view.tintColor, view: leftButtons.view)
-        cell.setPanGesture(.RightToLeft, mode: .Switch, color: redColor, view: rightButtons.view)
+        cell.setPanGesture(.LeftToRight, mode: .Switch, color: nil, view: leftButtons.view)
+        cell.setPanGesture(.RightToLeft, mode: .Switch, color: nil, view: rightButtons.view)
         
         cell.rightToLeftAttr.triggerPercentage = 0
         cell.rightToLeftAttr.rubberbandBounce = false
@@ -77,8 +75,11 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
+        tableViewCellCloseSwiping(cell)
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         // Implement your own `tableView:didSelectRowAtIndexPath:` here.
+        print("click cell")
     }
     
     // MARK: - Pan Trigger Action (Required)
@@ -118,6 +119,14 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         }
     }
 
+    func tableViewCellCloseSwiping(cell: PTATableViewCell) {
+        let slidingView = cell.getSlidingView()
+        var activeViewFrame = slidingView.bounds
+        if activeViewFrame.width > 0 {
+            activeViewFrame.origin.x = -activeViewFrame.width
+            slidingView.frame = activeViewFrame
+        }
+    }
     // Mark: - Method
     
     func makeButton(buttons:[String]) -> (view:UIView, width:Int) {
