@@ -3,6 +3,8 @@
 //  AppCustomTable
 //
 //  Created by nguyen quoc cuong on 12/10/15.
+//  skype : cuongnq88
+//  mail: cuongnguyenquoc88@gmail.com
 //  Copyright © 2015 nguyen quoc cuong. All rights reserved.
 //
 
