@@ -56,29 +56,50 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PTATableViewCell
         
+//        cell.delegate = self
+//        cell.textLabel?.text = objects[indexPath.row]
+//        
+//        let leftButtons = makeButton(["1","2"])
+//        let rightButtons = makeButton(["A","B","C"])
+//        
+//        cell.setPanGesture(.LeftToRight, mode: .Switch, color: nil, view: leftButtons.view)
+//        cell.setPanGesture(.RightToLeft, mode: .Switch, color: nil, view: rightButtons.view)
+//        
+//        cell.rightToLeftAttr.triggerPercentage = 0
+//        cell.rightToLeftAttr.rubberbandBounce = false
+//        cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
+//        
+//        cell.leftToRightAttr.triggerPercentage = 0
+//        cell.leftToRightAttr.rubberbandBounce = false
+//        cell.leftToRightAttr.viewBehavior = .StickThenDragWithPan
+        
         cell.delegate = self
         cell.textLabel?.text = objects[indexPath.row]
         
-        let leftButtons = makeButton(["1","2"])
-        let rightButtons = makeButton(["A","B","C"])
+        if indexPath.row == 0 {
+            let greenColor = UIColor(red: 85.0/255.0, green: 213.0/255.0, blue: 80.0/255.0, alpha: 1.0)
+            
+            cell.setPanGesture([.LeftToRight, .RightToLeft], mode: .Switch, color: view.tintColor, view: viewWithImage(named: "check"))
+            
+            cell.leftToRightAttr.viewBehavior = .DragWithPanThenStick
+            cell.leftToRightAttr.color = greenColor
+            cell.rightToLeftAttr.rubberbandBounce = false
+        } else {
+            let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
+            
+            cell.setPanGesture(.LeftToRight, mode: .Switch, color: view.tintColor, view: viewWithImage(named: "check"))
+            cell.setPanGesture(.RightToLeft, mode: .Exit, color: redColor, view: viewWithImage(named: "cross"))
+            
+            cell.rightToLeftAttr.triggerPercentage = 0.4
+            cell.rightToLeftAttr.rubberbandBounce = true
+            cell.rightToLeftAttr.viewBehavior = .DragWithPan
+        }
         
-        cell.setPanGesture(.LeftToRight, mode: .Switch, color: nil, view: leftButtons.view)
-        cell.setPanGesture(.RightToLeft, mode: .Switch, color: nil, view: rightButtons.view)
-        
-        cell.rightToLeftAttr.triggerPercentage = 0
-        cell.rightToLeftAttr.rubberbandBounce = false
-        cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
-        
-        cell.leftToRightAttr.triggerPercentage = 0
-        cell.leftToRightAttr.rubberbandBounce = false
-        cell.leftToRightAttr.viewBehavior = .StickThenDragWithPan
         
         return cell
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
-        tableViewCellCloseSwiping(cell)
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         // Implement your own `tableView:didSelectRowAtIndexPath:` here.
         print("click cell")
@@ -121,14 +142,6 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         }
     }
 
-    func tableViewCellCloseSwiping(cell: PTATableViewCell) {
-        let slidingView = cell.getSlidingView()
-        var activeViewFrame = slidingView.bounds
-        if activeViewFrame.width > 0 {
-            activeViewFrame.origin.x = -activeViewFrame.width
-            slidingView.frame = activeViewFrame
-        }
-    }
     // Mark: - Method
     
     func makeButton(buttons:[String]) -> (view:UIView, width:Int) {
@@ -141,6 +154,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
             button.setTitle(text, forState: .Normal)
             button.frame = CGRect(x: 51*i, y: 0, width: 50, height: 40)
             button.backgroundColor = listColor[i % listColor.count]
+            print("button color = \(button.backgroundColor)")
             button.addTarget(self, action: "buttonAction:", forControlEvents: .TouchUpInside)
             placeHolder.addSubview(button)
         }
@@ -148,7 +162,11 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
     func buttonAction(sender:UIButton) {
-        print("buttonAction");
+        let alert = UIAlertView()
+        alert.title = "Alert"
+        alert.message = "Here's a message button action " + sender.currentTitle!
+        alert.addButtonWithTitle("Understod")
+        alert.show()
     }
     
 }
