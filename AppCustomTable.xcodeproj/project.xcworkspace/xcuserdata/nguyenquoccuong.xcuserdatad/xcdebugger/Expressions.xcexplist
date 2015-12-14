@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "PTATableViewCell.pan(gestureState : UIGestureRecognizerState, translation : CGPoint, velocity : CGPoint) -&gt; ():PTATableViewCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = ".RightToLeft">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

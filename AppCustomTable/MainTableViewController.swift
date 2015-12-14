@@ -35,10 +35,10 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
     }
     
-    func viewWithImage(named named: String) -> UIView {
+    func viewWithImage(named named: String) -> (view:UIView, width:Int) {
         let imageView = UIImageView(image: UIImage(named: named))
         imageView.contentMode = .Center
-        return imageView
+        return (view: imageView, width: Int(imageView.bounds.width))
     }
     
     // MARK: - Table view data source
@@ -56,45 +56,27 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PTATableViewCell
         
-//        cell.delegate = self
-//        cell.textLabel?.text = objects[indexPath.row]
-//        
-//        let leftButtons = makeButton(["1","2"])
-//        let rightButtons = makeButton(["A","B","C"])
-//        
-//        cell.setPanGesture(.LeftToRight, mode: .Switch, color: nil, view: leftButtons.view)
-//        cell.setPanGesture(.RightToLeft, mode: .Switch, color: nil, view: rightButtons.view)
-//        
-//        cell.rightToLeftAttr.triggerPercentage = 0
-//        cell.rightToLeftAttr.rubberbandBounce = false
-//        cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
-//        
-//        cell.leftToRightAttr.triggerPercentage = 0
-//        cell.leftToRightAttr.rubberbandBounce = false
-//        cell.leftToRightAttr.viewBehavior = .StickThenDragWithPan
+        let leftButtons = viewWithImage(named: "check")
+        let rightButtons = makeButton(["A","B","C"])
+        let rightPercentage = Double(rightButtons.width)/Double(cell.bounds.width)
+        
         
         cell.delegate = self
         cell.textLabel?.text = objects[indexPath.row]
         
-        if indexPath.row == 0 {
-            let greenColor = UIColor(red: 85.0/255.0, green: 213.0/255.0, blue: 80.0/255.0, alpha: 1.0)
-            
-            cell.setPanGesture([.LeftToRight, .RightToLeft], mode: .Switch, color: view.tintColor, view: viewWithImage(named: "check"))
-            
-            cell.leftToRightAttr.viewBehavior = .DragWithPanThenStick
-            cell.leftToRightAttr.color = greenColor
-            cell.rightToLeftAttr.rubberbandBounce = false
-        } else {
-            let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
-            
-            cell.setPanGesture(.LeftToRight, mode: .Switch, color: view.tintColor, view: viewWithImage(named: "check"))
-            cell.setPanGesture(.RightToLeft, mode: .Exit, color: redColor, view: viewWithImage(named: "cross"))
-            
-            cell.rightToLeftAttr.triggerPercentage = 0.4
-            cell.rightToLeftAttr.rubberbandBounce = true
-            cell.rightToLeftAttr.viewBehavior = .DragWithPan
-        }
+        let greenColor = UIColor(red: 85.0/255.0, green: 213.0/255.0, blue: 80.0/255.0, alpha: 1.0)
+        let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
         
+        cell.setPanGesture(.LeftToRight, mode: .Switch, color: greenColor, view: leftButtons.view)
+        cell.setPanGesture(.RightToLeft, mode: .Exit, color: redColor, view: rightButtons.view)
+        
+        cell.leftToRightAttr.triggerPercentage = 0.2
+        cell.leftToRightAttr.rubberbandBounce = true
+        cell.leftToRightAttr.viewBehavior = .DragWithPanThenStick
+     
+        cell.rightToLeftAttr.triggerPercentage = rightPercentage
+        cell.rightToLeftAttr.rubberbandBounce = false
+        cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
         
         return cell
     }
@@ -103,6 +85,8 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         // Implement your own `tableView:didSelectRowAtIndexPath:` here.
         print("click cell")
+        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
+        cell.swipeToTageWith(percentage: 0.0)
     }
     
     // MARK: - Pan Trigger Action (Required)
@@ -146,7 +130,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     
     func makeButton(buttons:[String]) -> (view:UIView, width:Int) {
         let viewWidth = buttons.count * 51
-        let listColor = [UIColor.greenColor(), UIColor.redColor(), UIColor.darkGrayColor()]
+        let listColor = [UIColor.greenColor(), UIColor.darkGrayColor(), UIColor.redColor()]
         let placeHolder = UIView(frame: CGRect(x:0,y: 0,width: viewWidth,height: 40))
         
         for (i,text) in buttons.enumerate() {
@@ -154,7 +138,6 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
             button.setTitle(text, forState: .Normal)
             button.frame = CGRect(x: 51*i, y: 0, width: 50, height: 40)
             button.backgroundColor = listColor[i % listColor.count]
-            print("button color = \(button.backgroundColor)")
             button.addTarget(self, action: "buttonAction:", forControlEvents: .TouchUpInside)
             placeHolder.addSubview(button)
         }

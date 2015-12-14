@@ -321,7 +321,37 @@ private extension PTATableViewCell {
 			})
 	}
 	
+    private func moveToTageWith(percentage percentage: Double, duration: NSTimeInterval, direction: PTATableViewItemState) {
+        print("moveToTageWith = \(percentage)")
+        
+        print("CGRectGetWidth(bounds) = \(CGRectGetWidth(bounds))")
+        
+        var origin: CGFloat = 0.0
+        
+        if direction == .RightToLeft {
+            origin -= CGRectGetWidth(bounds) - CGRectGetWidth(self.slidingView.frame)
+        } else if direction == .LeftToRight {
+            origin += CGRectGetWidth(bounds)
+        }
+        
+        var frame = contentView.frame
+        frame.origin.x = origin
+        
+        print("frame = \(frame)")
+        
+        colorIndicatorView.backgroundColor = colorWith(percentage: percentage)
+        
+        UIView.animateWithDuration(duration, delay: 0.0, options: ([.CurveEaseOut, .AllowUserInteraction]), animations: { [unowned self] in
+            self.contentView.frame = frame
+            self.slidingView.alpha = 1.0
+            self.slideViewWith(percentage: PTATableViewItemHelper.percentageWith(offset: Double(origin), relativeToWidth: Double(CGRectGetWidth(self.bounds))), view: self.viewWith(percentage: percentage), andDragBehavior: self.viewBehaviorWith(percentage: percentage))
+            }, completion: { [unowned self] (completed: Bool) -> Void in
+                self.executeCompletionBlockWith(percentage: percentage)
+            })
+    }
+    
 	private func swipeToOriginWith(percentage percentage: Double) {
+        print("swipeToOriginWith")
 		executeCompletionBlockWith(percentage: percentage)
 		
 		let offset = PTATableViewItemHelper.offsetWith(percentage: percentage, relativeToWidth: CGRectGetWidth(bounds))
@@ -400,7 +430,10 @@ extension PTATableViewCell {
 		let percentage = PTATableViewItemHelper.percentageWith(offset: Double(actualTranslation.x), relativeToWidth: Double(CGRectGetWidth(bounds)))
 		direction = PTATableViewItemHelper.directionWith(percentage: percentage)
 		
+        print("percentage = \(percentage)")
+        
 		if (gestureState == .Began) || (gestureState == .Changed) {
+            print("Began || Changed")
 			setupSwipingView()
 			
 			contentView.frame = CGRectOffset(contentView.bounds, actualTranslation.x, 0.0)
@@ -414,6 +447,7 @@ extension PTATableViewCell {
 			
 			delegate?.tableViewCellIsSwiping?(self, withPercentage: percentage)
 		} else if (gestureState == .Ended) || (gestureState == .Cancelled) {
+            print("Ended || Cancelled")
 			let cellState = stateWith(percentage: percentage)
 			var cellMode: PTATableViewItemMode = .None
 			
@@ -426,7 +460,11 @@ extension PTATableViewCell {
 			if (cellMode == .Exit) && (direction != .None) {
 				moveWith(percentage: percentage, duration: animationDurationWith(velocity: velocity), direction: cellState)
 			} else {
-				swipeToOriginWith(percentage: percentage)
+                if(direction == .RightToLeft){
+                    moveToTageWith(percentage: percentage, duration: animationDurationWith(velocity: velocity), direction: direction)
+                } else {
+                    swipeToOriginWith(percentage: percentage)
+                }
 			}
 			
 			delegate?.tableViewCellDidEndSwiping?(self)
@@ -476,4 +514,8 @@ public extension PTATableViewCell {
 			}
 	}
 	
+    public func swipeToTageWith(percentage percentage: Double) {
+//        self.swipeToOriginWith(percentage: percentage)
+    }
+    
 }
