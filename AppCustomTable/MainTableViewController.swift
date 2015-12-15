@@ -55,11 +55,10 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PTATableViewCell
-        
+
         let leftButtons = viewWithImage(named: "check")
         let rightButtons = makeButton(["A","B","C"])
         let rightPercentage = Double(rightButtons.width)/Double(cell.bounds.width)
-        
         
         cell.delegate = self
         cell.textLabel?.text = objects[indexPath.row]
@@ -68,7 +67,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
         
         cell.setPanGesture(.LeftToRight, mode: .Switch, color: greenColor, view: leftButtons.view)
-        cell.setPanGesture(.RightToLeft, mode: .Exit, color: redColor, view: rightButtons.view)
+        cell.setPanGesture(.RightToLeft, mode: .Switch, color: redColor, view: rightButtons.view)
         
         cell.leftToRightAttr.triggerPercentage = 0.2
         cell.leftToRightAttr.rubberbandBounce = true
@@ -81,12 +80,16 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         return cell
     }
     
+//    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+//        print("click willDeselectRowAtIndexPath")
+//        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
+//        cell.swipeToTageWith(percentage: 0)
+//        return indexPath
+//    }
+    
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        // Implement your own `tableView:didSelectRowAtIndexPath:` here.
         print("click cell")
-        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
-        cell.swipeToTageWith(percentage: 0.0)
     }
     
     // MARK: - Pan Trigger Action (Required)
