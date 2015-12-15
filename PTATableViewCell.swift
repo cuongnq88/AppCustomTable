@@ -439,7 +439,6 @@ extension PTATableViewCell {
             moveToTageWith(percentage: -0.2, duration: animationDurationWith(velocity: velocity), direction: direction)
             return
         }
-        print("leftToRightAttr.triggerPercentage = \(rightToLeftAttr.triggerPercentage)")
         if (gestureState == .Began) || (gestureState == .Changed) {
             print("Began || Changed")
             setupSwipingView()
@@ -528,10 +527,6 @@ public extension PTATableViewCell {
                 stateOptions.remove(.RightToLeft)
             }
         }
-    }
-    
-    public func swipeToTageWith(percentage percentage: Double) {
-        //        self.swipeToOriginWith(percentage: percentage)
     }
     
 }

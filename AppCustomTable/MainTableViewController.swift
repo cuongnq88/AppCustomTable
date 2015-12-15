@@ -64,10 +64,10 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         cell.textLabel?.text = objects[indexPath.row]
         
         let greenColor = UIColor(red: 85.0/255.0, green: 213.0/255.0, blue: 80.0/255.0, alpha: 1.0)
-        let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
+//        let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
         
         cell.setPanGesture(.LeftToRight, mode: .Switch, color: greenColor, view: leftButtons.view)
-        cell.setPanGesture(.RightToLeft, mode: .Switch, color: redColor, view: rightButtons.view)
+        cell.setPanGesture(.RightToLeft, mode: .Switch, color: UIColor.clearColor(), view: rightButtons.view)
         
         cell.leftToRightAttr.triggerPercentage = 0.2
         cell.leftToRightAttr.rubberbandBounce = true
@@ -80,12 +80,12 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         return cell
     }
     
-//    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-//        print("click willDeselectRowAtIndexPath")
-//        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
-//        cell.swipeToTageWith(percentage: 0)
-//        return indexPath
-//    }
+    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+        print("click willDeselectRowAtIndexPath")
+        let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
+        cell.reset()
+        return indexPath
+    }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
