@@ -64,7 +64,6 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         cell.textLabel?.text = objects[indexPath.row]
         
         let greenColor = UIColor(red: 85.0/255.0, green: 213.0/255.0, blue: 80.0/255.0, alpha: 1.0)
-//        let redColor = UIColor(red: 232.0/255.0, green: 61.0/255.0, blue: 14.0/255.0, alpha: 1.0)
         
         cell.setPanGesture(.LeftToRight, mode: .Switch, color: greenColor, view: leftButtons.view)
         cell.setPanGesture(.RightToLeft, mode: .Switch, color: UIColor.clearColor(), view: rightButtons.view)
@@ -131,16 +130,16 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
 
     // Mark: - Method
     
-    func makeButton(buttons:[String]) -> (view:UIView, width:Int) {
-        let viewWidth = buttons.count * 51
-        let listColor = [UIColor.greenColor(), UIColor.darkGrayColor(), UIColor.redColor()]
+    func makeButton(sizeButton: Int,buttons:[String], colors:[UIColor], actions:[String]) -> (view:UIView, width:Int) {
+        let viewWidth = buttons.count * 50
+//        let listColor = [UIColor.greenColor(), UIColor.darkGrayColor(), UIColor.redColor()]
         let placeHolder = UIView(frame: CGRect(x:0,y: 0,width: viewWidth,height: 40))
         
         for (i,text) in buttons.enumerate() {
             let button = UIButton(type: .Custom)
             button.setTitle(text, forState: .Normal)
-            button.frame = CGRect(x: 51*i, y: 0, width: 50, height: 40)
-            button.backgroundColor = listColor[i % listColor.count]
+            button.frame = CGRect(x: 50*i, y: 0, width: 50, height: 40)
+            button.backgroundColor = colors[i % colors.count]
             button.addTarget(self, action: "buttonAction:", forControlEvents: .TouchUpInside)
             placeHolder.addSubview(button)
         }
