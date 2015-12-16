@@ -236,6 +236,7 @@ private extension PTATableViewCell {
     
     private func slideViewWith(percentage percentage: Double, view: UIView?, andDragBehavior dragBehavior: PTATableViewItemSlidingViewBehavior) {
         var position = CGPointZero
+        print("bounds = \(bounds)")
         position.y = CGRectGetHeight(bounds) / 2.0
         
         let width = CGRectGetWidth(bounds)
@@ -295,6 +296,8 @@ private extension PTATableViewCell {
             activeViewFrame.origin.x = position.x - (activeViewFrame.size.width / 2.0)
             activeViewFrame.origin.y = position.y - (activeViewFrame.size.height / 2.0)
             
+            print(activeViewFrame)
+            
             slidingView.frame = activeViewFrame
         }
     }
@@ -346,6 +349,7 @@ private extension PTATableViewCell {
     }
     
     private func swipeToOriginWith(percentage percentage: Double) {
+        isOpenRight = false
         executeCompletionBlockWith(percentage: percentage)
         
         let offset = PTATableViewItemHelper.offsetWith(percentage: percentage, relativeToWidth: CGRectGetWidth(bounds))
@@ -425,6 +429,9 @@ extension PTATableViewCell {
         direction = PTATableViewItemHelper.directionWith(percentage: percentage)
         if(direction == .RightToLeft && percentage < -rightToLeftAttr.triggerPercentage) {
             moveToTageWith(percentage: -0.2, duration: animationDurationWith(velocity: velocity), direction: direction)
+            return
+        }
+        if(direction == .RightToLeft && isOpenRight) {
             return
         }
         if (gestureState == .Began) || (gestureState == .Changed) {

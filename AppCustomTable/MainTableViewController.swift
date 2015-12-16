@@ -67,7 +67,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         /*properties changing lines*/
         //lineButton = 0 : hiden lines
         //lineButton = 1 : display lines
-        let rightButtons = makeButton(CGSize(width: 50,height: 40),lineButton: 0,buttons: buttons,colors: colors,actions: actions)
+        let rightButtons = makeButton(CGSize(width: 50,height: cell.bounds.height),lineButton: 0,buttons: buttons,colors: colors,actions: actions)
         //caculate percentage for rightPercentage
         let rightPercentage = Double(rightButtons.width)/Double(cell.bounds.width)
         
@@ -91,6 +91,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
     override func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        print("shouldHighlightRowAtIndexPath")
         let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
         if(cell.isOpenRight) {
             cell.swipeToOriginRight()
