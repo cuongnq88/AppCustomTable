@@ -5,14 +5,14 @@
 //  Created by nguyen quoc cuong on 12/10/15.
 //  skype : cuongnq88
 //  mail: cuongnguyenquoc88@gmail.com
-//  Copyright © 2015 nguyen quoc cuong. All rights reserved.
+//  Copyright Â© 2015 nguyen quoc cuong. All rights reserved.
 //
 
 import UIKit
 
 class MainTableViewController: UITableViewController , PTATableViewCellDelegate {
-
-    var objects = ["Swipe Me Left or Right", "Swipe Me Left to Delete"]
+    
+    var objects = ["Swipe Me Left or Right", "Swipe Me Left or Right"]
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -23,14 +23,14 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")    }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     func insertNewObject(sender: AnyObject) {
-        objects += ["Swipe Me Left to Delete"]
+        objects += ["Swipe Me Left or Right"]
         let indexPath = NSIndexPath(forRow: (objects.count - 1), inSection: 0)
         tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
     }
@@ -42,22 +42,33 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
     // MARK: - Table view data source
-
+    
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return objects.count
     }
     
+    // copy all method tableview to source code of you
+    
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PTATableViewCell
-
+        
+        let buttons = ["A","B","C"] // create list name of button
+        let colors = [UIColor.greenColor(), UIColor.darkGrayColor(), UIColor.redColor()] // create list color of button
+        let actions = ["buttonActionFirst:","buttonActionSecond:","buttonActionThird:"] // create list action of button
+        
         let leftButtons = viewWithImage(named: "check")
-        let rightButtons = makeButton(["A","B","C"])
+        //create view container list button
+        /*properties changing lines*/
+        //lineButton = 0 : hiden lines
+        //lineButton = 1 : display lines
+        let rightButtons = makeButton(CGSize(width: 50,height: 40),lineButton: 0,buttons: buttons,colors: colors,actions: actions)
+        //caculate percentage for rightPercentage
         let rightPercentage = Double(rightButtons.width)/Double(cell.bounds.width)
         
         cell.delegate = self
@@ -71,7 +82,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         cell.leftToRightAttr.triggerPercentage = 0.2
         cell.leftToRightAttr.rubberbandBounce = true
         cell.leftToRightAttr.viewBehavior = .DragWithPanThenStick
-     
+        
         cell.rightToLeftAttr.triggerPercentage = rightPercentage
         cell.rightToLeftAttr.rubberbandBounce = false
         cell.rightToLeftAttr.viewBehavior = .StickThenDragWithPan
@@ -79,31 +90,27 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
         return cell
     }
     
-    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-        print("click willDeselectRowAtIndexPath")
+    override func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         let cell = tableView.cellForRowAtIndexPath(indexPath) as! PTATableViewCell
-        cell.reset()
-        return indexPath
+        if(cell.isOpenRight) {
+            cell.swipeToOriginRight()
+            return false;
+        }
+        return true
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        print("click cell")
     }
     
     // MARK: - Pan Trigger Action (Required)
     
     func tableViewCell(cell: PTATableViewCell, didTriggerState state: PTATableViewItemState, withMode mode: PTATableViewItemMode) {
-        if let indexPath = tableView.indexPathForCell(cell) {
-            switch mode {
-            case .Switch:
+        // please mark or add the left-right dragging trigger action.
+        if(state == .LeftToRight) {
+            if let indexPath = tableView.indexPathForCell(cell) {
+                //input code when the left-right dragging trigger action.
                 print("row \(indexPath.row)'s switch was triggered")
-            case .Exit:
-                print("row \(indexPath.row)'s exit was triggered")
-                objects.removeAtIndex(indexPath.row)
-                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            default:
-                break
             }
         }
     }
@@ -127,26 +134,50 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
             print("row \(indexPath.row) ended swiping")
         }
     }
-
-    // Mark: - Method
     
-    func makeButton(sizeButton: Int,buttons:[String], colors:[UIColor], actions:[String]) -> (view:UIView, width:Int) {
-        let viewWidth = buttons.count * 50
-//        let listColor = [UIColor.greenColor(), UIColor.darkGrayColor(), UIColor.redColor()]
-        let placeHolder = UIView(frame: CGRect(x:0,y: 0,width: viewWidth,height: 40))
+    // Mark: - Method make button
+    
+    func makeButton(sizeButton: CGSize,lineButton: Int,buttons:[String], colors:[UIColor], actions:[String]) -> (view:UIView, width:Int) {
+        let viewWidth = buttons.count * (Int(sizeButton.width) + lineButton)
+        let placeHolder = UIView(frame: CGRect(x:0,y: 0,width: viewWidth,height: Int(sizeButton.height)))
         
         for (i,text) in buttons.enumerate() {
             let button = UIButton(type: .Custom)
             button.setTitle(text, forState: .Normal)
-            button.frame = CGRect(x: 50*i, y: 0, width: 50, height: 40)
-            button.backgroundColor = colors[i % colors.count]
-            button.addTarget(self, action: "buttonAction:", forControlEvents: .TouchUpInside)
+            button.frame = CGRect(x: (Int(sizeButton.width) + lineButton)*i, y: 0, width: Int(sizeButton.width), height: Int(sizeButton.height))
+            button.backgroundColor = colors[i]
+            let action : Selector = Selector(actions[i])
+            button.addTarget(self, action: action, forControlEvents: .TouchUpInside)
             placeHolder.addSubview(button)
         }
         return (view: placeHolder, width: viewWidth)
     }
     
-    func buttonAction(sender:UIButton) {
+    // Mark: - Method make button action
+    
+    // action of button name A
+    func buttonActionFirst(sender:UIButton) {
+        //your input code
+        let alert = UIAlertView()
+        alert.title = "Alert"
+        alert.message = "Here's a message button action " + sender.currentTitle!
+        alert.addButtonWithTitle("Understod")
+        alert.show()
+    }
+    
+    // action of button name B
+    func buttonActionSecond(sender:UIButton) {
+        //your input code
+        let alert = UIAlertView()
+        alert.title = "Alert"
+        alert.message = "Here's a message button action " + sender.currentTitle!
+        alert.addButtonWithTitle("Understod")
+        alert.show()
+    }
+    
+    // action of button name C
+    func buttonActionThird(sender:UIButton) {
+        //your input code
         let alert = UIAlertView()
         alert.title = "Alert"
         alert.message = "Here's a message button action " + sender.currentTitle!
@@ -155,19 +186,3 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

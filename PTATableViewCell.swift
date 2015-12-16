@@ -27,10 +27,10 @@ public protocol ObjC_PTATableViewCellDelegate: NSObjectProtocol {
     
 }
 
-/** The delegate of a PTATableViewCell object must adopt the PTATableViewCellDelegate protocol in order to perform an action when triggered. Optional methods of the protocol allow the delegate to be notified of a cellâ€™s swipe state, and determine whether a cell should be swiped. */
+/** The delegate of a PTATableViewCell object must adopt the PTATableViewCellDelegate protocol in order to perform an action when triggered. Optional methods of the protocol allow the delegate to be notified of a cellÃ¢â‚¬â„¢s swipe state, and determine whether a cell should be swiped. */
 public protocol PTATableViewCellDelegate: ObjC_PTATableViewCellDelegate {
     
-    /** Tells the delegate that the specified cellâ€™s state was triggered. */
+    /** Tells the delegate that the specified cellÃ¢â‚¬â„¢s state was triggered. */
     func tableViewCell(cell: PTATableViewCell, didTriggerState state: PTATableViewItemState, withMode mode: PTATableViewItemMode)
     
 }
@@ -48,7 +48,7 @@ public class PTATableViewCell: UITableViewCell {
     private var stateOptions: PTATableViewItemState = .None
     
     
-    /** The color thatâ€™s revealed before an action is triggered. Defaults to a light gray color. */
+    /** The color thatÃ¢â‚¬â„¢s revealed before an action is triggered. Defaults to a light gray color. */
     public var defaultColor = UIColor(red: 227.0/255.0, green: 227.0/255.0, blue: 227.0/255.0, alpha: 1.0)
     
     /** The attributes used when swiping the cell from left to right. */
@@ -57,6 +57,7 @@ public class PTATableViewCell: UITableViewCell {
     /** The attributes used when swiping the cell from right to left. */
     public var rightToLeftAttr = PTATableViewItemStateAttributes()
     
+    public var isOpenRight: Bool = false
     
     private var _slidingView: UIView?
     private var slidingView: UIView! {
@@ -234,7 +235,6 @@ private extension PTATableViewCell {
     }
     
     private func slideViewWith(percentage percentage: Double, view: UIView?, andDragBehavior dragBehavior: PTATableViewItemSlidingViewBehavior) {
-        print("slideViewWith percentage = \(percentage)")
         var position = CGPointZero
         position.y = CGRectGetHeight(bounds) / 2.0
         
@@ -245,7 +245,6 @@ private extension PTATableViewCell {
         switch dragBehavior {
             
         case .StickThenDragWithPan:
-            print("StickThenDragWithPan")
             if direction == .LeftToRight {
                 if (percentage >= 0.0) && (percentage < leftToRightAttr.triggerPercentage) {
                     position.x = PTATableViewItemHelper.offsetWith(percentage: halfLeftToRightTriggerPercentage, relativeToWidth: width)
@@ -261,7 +260,6 @@ private extension PTATableViewCell {
             }
             
         case .DragWithPanThenStick:
-            print("DragWithPanThenStick")
             if direction == .LeftToRight {
                 if (percentage >= 0.0) && (percentage < leftToRightAttr.triggerPercentage) {
                     position.x = PTATableViewItemHelper.offsetWith(percentage: percentage - halfLeftToRightTriggerPercentage, relativeToWidth: width)
@@ -284,7 +282,6 @@ private extension PTATableViewCell {
             }
             
         case .None:
-            print("None")
             if direction == .LeftToRight {
                 position.x = PTATableViewItemHelper.offsetWith(percentage: halfLeftToRightTriggerPercentage, relativeToWidth: width)
             } else if direction == .RightToLeft {
@@ -294,7 +291,6 @@ private extension PTATableViewCell {
         }
         
         if let activeView = view {
-            print("position.x = \(position.x)")
             var activeViewFrame = activeView.bounds
             activeViewFrame.origin.x = position.x - (activeViewFrame.size.width / 2.0)
             activeViewFrame.origin.y = position.y - (activeViewFrame.size.height / 2.0)
@@ -327,12 +323,8 @@ private extension PTATableViewCell {
     }
     
     private func moveToTageWith(percentage percentage: Double, duration: NSTimeInterval, direction: PTATableViewItemState) {
-        print("moveToTageWith = \(percentage)")
-        
-        print("CGRectGetWidth(bounds) = \(CGRectGetWidth(bounds))")
-        
+        isOpenRight = true
         var origin: CGFloat = 0.0
-        
         if direction == .RightToLeft {
             origin = -CGRectGetWidth(self.slidingView.frame)
         } else if direction == .LeftToRight {
@@ -341,8 +333,6 @@ private extension PTATableViewCell {
         
         var frame = contentView.frame
         frame.origin.x = origin
-        
-        print("frame = \(frame)")
         
         colorIndicatorView.backgroundColor = colorWith(percentage: percentage)
         
@@ -356,7 +346,6 @@ private extension PTATableViewCell {
     }
     
     private func swipeToOriginWith(percentage percentage: Double) {
-        print("swipeToOriginWith")
         executeCompletionBlockWith(percentage: percentage)
         
         let offset = PTATableViewItemHelper.offsetWith(percentage: percentage, relativeToWidth: CGRectGetWidth(bounds))
@@ -434,16 +423,13 @@ extension PTATableViewCell {
         let actualTranslation = actualizeTranslation(translation)
         let percentage = PTATableViewItemHelper.percentageWith(offset: Double(actualTranslation.x), relativeToWidth: Double(CGRectGetWidth(bounds)))
         direction = PTATableViewItemHelper.directionWith(percentage: percentage)
-        print("percentage = \(percentage)")
         if(direction == .RightToLeft && percentage < -rightToLeftAttr.triggerPercentage) {
             moveToTageWith(percentage: -0.2, duration: animationDurationWith(velocity: velocity), direction: direction)
             return
         }
         if (gestureState == .Began) || (gestureState == .Changed) {
-            print("Began || Changed")
             setupSwipingView()
             contentView.frame = CGRectOffset(contentView.bounds, actualTranslation.x, 0.0)
-            print("contentView.frame = \(contentView.frame)")
             colorIndicatorView.backgroundColor = colorWith(percentage: percentage)
             slidingView.alpha = alphaWith(percentage: percentage)
             
@@ -454,8 +440,7 @@ extension PTATableViewCell {
             
             delegate?.tableViewCellIsSwiping?(self, withPercentage: percentage)
         } else if (gestureState == .Ended) || (gestureState == .Cancelled) {
-            print("Ended || Cancelled")
-            
+
             let cellState = stateWith(percentage: percentage)
             var cellMode: PTATableViewItemMode = .None
             
@@ -468,9 +453,7 @@ extension PTATableViewCell {
             if (cellMode == .Exit) && (direction != .None) {
                 moveWith(percentage: percentage, duration: animationDurationWith(velocity: velocity), direction: cellState)
             } else {
-                print("cellMode != .Exit")
                 if(direction == .RightToLeft){
-                    print("-rightToLeftAttr.triggerPercentage/2 = \(-rightToLeftAttr.triggerPercentage/2)")
                     if(percentage <= -rightToLeftAttr.triggerPercentage/3) {
                         moveToTageWith(percentage: percentage, duration: animationDurationWith(velocity: velocity), direction: direction)
                     }
@@ -508,7 +491,7 @@ extension PTATableViewCell {
 
 public extension PTATableViewCell {
     
-    /** Sets a pan gesture for the specified state and mode. Donâ€™t forget to implement the delegate method `tableViewCell(cell:didTriggerState:withMode:)` to perform an action when the cellâ€™s state is triggered. */
+    /** Sets a pan gesture for the specified state and mode. DonÃ¢â‚¬â„¢t forget to implement the delegate method `tableViewCell(cell:didTriggerState:withMode:)` to perform an action when the cellÃ¢â‚¬â„¢s state is triggered. */
     public func setPanGesture(state: PTATableViewItemState, mode: PTATableViewItemMode, color: UIColor?, view: UIView?) {
         stateOptions.insert(state)
         
@@ -527,6 +510,20 @@ public extension PTATableViewCell {
                 stateOptions.remove(.RightToLeft)
             }
         }
+    }
+    
+    public func swipeToOriginRight() {
+        isOpenRight = false
+        let  percentage: Double = -rightToLeftAttr.triggerPercentage
+        let offset = PTATableViewItemHelper.offsetWith(percentage: percentage, relativeToWidth: CGRectGetWidth(bounds))
+        UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 1, initialSpringVelocity: offset / 100.0, options: ([.CurveEaseOut, .AllowUserInteraction]), animations: { [unowned self] in
+            self.contentView.frame = self.contentView.bounds
+            self.colorIndicatorView.backgroundColor = self.defaultColor
+            self.slidingView.alpha = 1.0
+            self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: self.viewBehaviorWith(percentage: percentage))
+            }, completion: { [unowned self] (completed: Bool) -> Void in
+                self.reset()
+            })
     }
     
 }
