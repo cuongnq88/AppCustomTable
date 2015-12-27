@@ -54,7 +54,7 @@ class MainTableViewController: UITableViewController , PTATableViewCellDelegate 
     }
     
     // copy all method tableview to source code of you
-    
+    //pragma mark mark function
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PTATableViewCell
         

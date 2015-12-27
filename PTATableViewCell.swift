@@ -236,7 +236,6 @@ private extension PTATableViewCell {
     
     private func slideViewWith(percentage percentage: Double, view: UIView?, andDragBehavior dragBehavior: PTATableViewItemSlidingViewBehavior) {
         var position = CGPointZero
-        print("bounds = \(bounds)")
         position.y = CGRectGetHeight(bounds) / 2.0
         
         let width = CGRectGetWidth(bounds)
@@ -295,8 +294,6 @@ private extension PTATableViewCell {
             var activeViewFrame = activeView.bounds
             activeViewFrame.origin.x = position.x - (activeViewFrame.size.width / 2.0)
             activeViewFrame.origin.y = position.y - (activeViewFrame.size.height / 2.0)
-            
-            print(activeViewFrame)
             
             slidingView.frame = activeViewFrame
         }
@@ -433,6 +430,8 @@ extension PTATableViewCell {
         }
         if(direction == .RightToLeft && isOpenRight) {
             return
+        }else if(direction == .LeftToRight && isOpenRight) {
+            swipeToOriginRight()
         }
         if (gestureState == .Began) || (gestureState == .Changed) {
             setupSwipingView()
@@ -447,7 +446,6 @@ extension PTATableViewCell {
             
             delegate?.tableViewCellIsSwiping?(self, withPercentage: percentage)
         } else if (gestureState == .Ended) || (gestureState == .Cancelled) {
-
             let cellState = stateWith(percentage: percentage)
             var cellMode: PTATableViewItemMode = .None
             
@@ -520,7 +518,6 @@ public extension PTATableViewCell {
     }
     
     public func swipeToOriginRight() {
-        isOpenRight = false
         let  percentage: Double = -rightToLeftAttr.triggerPercentage
         let offset = PTATableViewItemHelper.offsetWith(percentage: percentage, relativeToWidth: CGRectGetWidth(bounds))
         UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 1, initialSpringVelocity: offset / 100.0, options: ([.CurveEaseOut, .AllowUserInteraction]), animations: { [unowned self] in
@@ -529,8 +526,9 @@ public extension PTATableViewCell {
             self.slidingView.alpha = 1.0
             self.slideViewWith(percentage: 0.0, view: self.viewWith(percentage: percentage), andDragBehavior: self.viewBehaviorWith(percentage: percentage))
             }, completion: { [unowned self] (completed: Bool) -> Void in
+                self.isOpenRight = false
                 self.reset()
             })
     }
-    
+
 }
